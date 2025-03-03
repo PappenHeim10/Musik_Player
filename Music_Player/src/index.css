@@ -1,0 +1,34 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  margin: auto;
+  max-width: 38rem;
+  padding: 2rem;
+}
+
+footer{
+  margin-bottom: auto;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  font-size: x-small;
+}
+
+footer div{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.btns{
+  background-color: azure;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.btn_play{
+  background-color: white;
+}
+.btn_pause{
+  background-color: white;
+}
