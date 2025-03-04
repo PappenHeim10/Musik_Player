@@ -15,7 +15,16 @@ playPauseButton.addEventListener("click", () => { // NOTE:wenn gecklickt wird
     }
 });
   
-prevButton.addEventListener("click", () => {
-    alert("test");
-});
+// IDEA: Eine Variable für die direcoriy erstellen und durch sie durch iterieren
 
+
+var audioDuration = song.duration;
+
+var duration = document.getElementById("duration");
+function updateDuration() {
+    var currentTime = song.currentTime;
+    var minutes = Math.floor(currentTime / 60);
+    var seconds = Math.floor(currentTime % 60);
+
+    duration.innerHTML = minutes + ":" + (seconds < 10? "0" : "") + seconds;
+}
