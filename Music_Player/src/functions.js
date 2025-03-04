@@ -27,4 +27,8 @@ function updateDuration() {
     var seconds = Math.floor(currentTime % 60);
 
     duration.innerHTML = minutes + ":" + (seconds < 10? "0" : "") + seconds;
+
 }
+
+
+song.addEventListener('timeupdate', updateDuration);
