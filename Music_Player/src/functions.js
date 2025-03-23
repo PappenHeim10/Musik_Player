@@ -14,8 +14,6 @@ playPauseButton.addEventListener("click", () => { // NOTE:wenn gecklickt wird
       playPauseButton.classList.add("btn_play");
     }
 });
-  
-// IDEA: Eine Variable für die direcoriy erstellen und durch sie durch iterieren
 
 
 var audioDuration = song.duration;
