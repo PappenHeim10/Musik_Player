@@ -391,6 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Playliste erstellungs-Elemete ausblenden
     playListButtonAbbrechen.addEventListener("click", () => {
+        playListeName.value = "";
         playListcreateionElements.setAttribute('hidden', true);
     });
 
