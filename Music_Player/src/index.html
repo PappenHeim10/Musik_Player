@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css"> <title>Electron Musik Player</title>
+    <link rel="stylesheet" href="styles.css"> <title>Sound Lord </title>
 </head>
 <body>
     <h1>Meine Musik</h1>
-    
     <div id="songList">
         <p id="leereSongListe">Lade Songliste...</p>
         <ul> </ul>
     </div>
+    <div class="playlistenContainer">
+        <h2>Playlisten</h2>
+        <div id="playListe">
+            <p id="keinePlayListe">Keine Playliste verfügbar</p>
+            <ul></ul>
+        </div>
+        <div class="dropDownContainer">
+            <div class="dropDown">
 
+            </div>
+        </div>
+    </div>
     <div id="errorMessage" style="color: red;"></div> <div id="player">
         <div id="nowPlaying">Nichts ausgewählt</div>
     </div>

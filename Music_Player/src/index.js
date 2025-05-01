@@ -18,7 +18,7 @@ const server = http.createServer(async (req, res) => { // ich kann mit der Funkt
     const pathname = parsedUrl.pathname;
     console.log(`[Server] Anfrage empfangen: ${req.method} ${pathname}`);
 
-    // CORS Header
+    // CORS Header NOTE: Ich habe keine ahnung was das heißt
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     try {
@@ -37,7 +37,7 @@ const server = http.createServer(async (req, res) => { // ich kann mit der Funkt
 
         // --- API Endpunkt: Audiodatei streamen ---
         if (pathname.startsWith('/api/audio/') && req.method === 'GET') {
-            if (!selectedMusicDirectory) {
+            if (!selectedMusicDirectory) { 
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
                 res.end('Musikordner nicht ausgewählt');
                 return;

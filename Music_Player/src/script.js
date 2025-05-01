@@ -12,15 +12,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const progressBar = document.getElementById("progressBar");
     const openFolderButton = document.getElementById("openFolderButton");
     const songListElement = document.getElementById("songList")?.querySelector('ul'); // Sicherstellen, dass UL existiert
-    const leereListeElement = document.getElementById("leereSongListe");
+    const leereListeElement = document.getElementById("leereSongListe"); // Sicherstellen, dass P existiert
     const nowPlayingElement = document.getElementById("nowPlaying");
     const errorMessageElement = document.getElementById("errorMessage");
+    const playListeElement = document.getElementById("playListe")?.querySelector('ul'); // Element für die Playliste
+    const playListButton = document.getElementById("playListeButton"); // Button für die Playliste
+    const playListcreateionElements = document.querySelector(".erstellenIn"); // Element für die Playliste erstellen
+    const playListButtonAbbrechen = document.getElementById("playListeButtonAbbrechen"); // Button für die Playliste abbrechen
+    const playListeName = document.getElementById("playListeName"); // Input für den Namen der Playliste
+    const playListSpeichernButton = document.getElementById("playListeSpeichernButton"); // Button für die Playliste speichern
+    const leeren = document.getElementById("playListe")?.querySelector("p");
+    const dropdownMenu = document.querySelector(".auswahlPlayListContainer");
+
+    
 
     // Player-Zustand
     let audio = new Audio(); // Das HTMLAudioElement für die Wiedergabe
     let currentTrackIndex = -1; // Index des aktuellen Tracks in der 'tracks'-Liste, -1 für keinen
     let isPlaying = false; // Spielt gerade ein Track?
     let tracks = []; // Array zum Speichern der Dateinamen der Songs
+    let playListen = [];
 
     const API_BASE_URL = 'http://localhost:3001'; // Basis-URL für die lokale API
 
@@ -29,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     /**
      * Lädt die Songliste von der lokalen API und aktualisiert die UI.
      */
-    async function fetchAndDisplaySongs() {
+    async function fetchAndDisplaySongs() { // OPTIM: Es entseht immer ein INitialer Fehler beim Öffnen der App. 
         console.log("Versuche Songliste von API zu laden...");
         errorMessageElement.textContent = ''; // Alte Fehler löschen
         nowPlayingElement.textContent = 'Lade Liste...';
@@ -63,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (songListElement) {
                     songListElement.innerHTML = tracks.map((filename, index) => {
                         // Einfacher Dateiname ohne Pfad wird angezeigt
-                        return `<li data-index="${index}">${filename}</li>`;
+                        return `<li data-index="${index}">${filename}</li><button class="zuPLHinzufuegen">+</button>`;
                     }).join('');
                     setupSongListClick(); // Klick-Listener für die Liste aktivieren
                 }
@@ -167,6 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
             stopTrack(); // Aktuellen stoppen
             const nextIndex = (currentTrackIndex + 1) % tracks.length;
             loadTrack(nextIndex);
+            audio.play(); // Direkt abspielen, wenn möglich
             // Wenn vorher gespielt wurde, den neuen Track direkt starten
             if (wasPlaying) {
                  // Kurze Verzögerung manchmal hilfreich
@@ -195,7 +207,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- UI Hilfsfunktionen ---
-
     /**
      * Aktualisiert die Lautstärke des Audio-Elements basierend auf dem Slider.
      */
@@ -226,7 +237,6 @@ document.addEventListener("DOMContentLoaded", function () {
              audio.currentTime = time;
          }
      }
-
 
     /**
      * Fügt Event-Listener zu den Listeneinträgen hinzu, um Tracks per Klick zu laden.
@@ -268,7 +278,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // --- Event Listener Initialisierung ---
-
     // Player Controls
     if (playButton) playButton.addEventListener("click", togglePlayPause);
     if (nextButton) nextButton.addEventListener("click", nextTrack);
@@ -327,6 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
           if (progressBar) progressBar.value = 0;
      });
 
+
     // Ordnerauswahl
     if (openFolderButton) {
         openFolderButton.addEventListener('click', () => {
@@ -339,6 +349,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
          console.error("Button 'openFolderButton' nicht gefunden!");
     }
+
 
     // Listener für Bestätigung der Ordnerauswahl vom Main-Prozess
     if (window.electronAPI && typeof window.electronAPI.onMusicFolderSelected === 'function') {
@@ -358,7 +369,6 @@ document.addEventListener("DOMContentLoaded", function () {
          errorMessageElement.textContent = "Fehler: Verbindung zum Backend fehlt.";
     }
 
-
     // --- Initialisierung beim Laden der Seite ---
     console.log("DOM geladen. Initialisiere Player.");
     // Setze initiale Lautstärke
@@ -372,4 +382,98 @@ document.addEventListener("DOMContentLoaded", function () {
          nowPlayingElement.textContent = 'Nichts ausgewählt';
     }
 
-}); // Ende DOMContentLoaded
+
+    //                      ---Playliste erstellen---
+    //Playlist ertellungs-Elemente anzeigen
+    playListButton.addEventListener("click", () => {
+        playListcreateionElements.removeAttribute('hidden');
+    });
+
+    // Playliste erstellungs-Elemete ausblenden
+    playListButtonAbbrechen.addEventListener("click", () => {
+        playListcreateionElements.setAttribute('hidden', true);
+    });
+
+    // Funktion zum Aktualisieren der Playlist-Anzeige
+    function updatePlaylistDisplay() {
+        if (playListeElement) {
+            playListeElement.innerHTML = playListen.map((name, index) => {
+                return `<div><li class="itemToDelete" data-index="${index}">${name}</li> <button class="deletePlayListeButton" id="${index}">Löschen</button></div>`;
+            }).join('');
+        }
+    }
+
+    // Playliste erstellen
+    playListSpeichernButton.addEventListener("click", () => {
+        const playListeNameValue = playListeName.value.trim();
+        if (playListeNameValue.length > 0) {
+            playListen.push(playListeNameValue);
+            console.log("Playliste erstellt:", playListen);
+            playListeName.value = ''; // Eingabefeld leeren
+            playListcreateionElements.setAttribute('hidden', true); // Elemente ausblenden
+            leeren.remove();
+            updatePlaylistDisplay(); // Anzeige aktualisieren!
+        } else {
+            //OPTIM: Hier muss eine bessere ausgabe für die Fehlermeldung hin
+            console.log("Bitte einen gültigen Namen für die Playliste eingeben.");
+        }
+    });
+
+
+
+    // Initiales Anzeigen der Playlist (falls schon Playlists vorhanden sind)
+    updatePlaylistDisplay();
+
+    // Playliste löschen (mit Event Delegation)
+    if (playListeElement) {
+        playListeElement.addEventListener("click", (event) => {
+            const clickedButton = event.target;
+            if (clickedButton.classList.contains("deletePlayListeButton")) {
+                const playlistIndex = parseInt(clickedButton.id, 10);
+
+                if (!isNaN(playlistIndex) && playlistIndex >= 0 && playlistIndex < playListen.length) {
+                    console.log("Lösche Playlist mit Index:", playlistIndex);
+                    playListen.splice(playlistIndex, 1); // Playlist aus dem Array entfernen
+                    updatePlaylistDisplay(); // Anzeige aktualisieren
+                } else {
+                    console.error("Ungültiger Playlist-Index:", playlistIndex);
+                }
+            }
+        });
+    }
+
+    // Playlist Hinzufügen
+    if(songListElement){
+        songListElement.addEventListener("click", (even) => {
+            const clickedButton = even.target;
+            if (clickedButton.classList.contains("zuPLHinzufuegen")) {
+                dropdownMenu.classList.toggle("show"); // Für die anzeige des dropdown
+                const auswahlElemente = dropdownMenu.querySelector('div');
+    
+                if(playListen.length > 0){
+                    auswahlElemente.innerHTML = playListen.map((name, index) => {
+                        return `<a class="itemToDelete" href="#" data-index="${index}">${name}<a>`;
+                    }).join('');
+                }else{
+                    auswahlElemente.innerHTML = "Keine Playlisten verfügbar."
+                }
+    
+    
+                const Index = parseInt(clickedButton.previousElementSibling.dataset.index, 10);
+                if (!isNaN(Index) && Index >= 0){
+                    console.log(Index);
+                }else{
+                    console.error("Ungültiger Song-Index:", Index);
+                }
+            }
+    
+            window.addEventListener('click', function(event) {
+                if (event.target !== clickedButton && !event.target.closest('.dropDown')) {
+                    if (dropdownMenu.classList.contains('show')) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                }
+            });
+        })
+    }   
+});  // Ende DOMContentLoaded
